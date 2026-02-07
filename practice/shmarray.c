@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
     key_t key;
     int shmid;
     struct Player *player_ptr;
-    if((key=ftok("shmarray.c",'R'))==-1) {
+    if((key=ftok("shmstruct.c",'R'))==-1) {
         perror("ftok");
         exit(1);
     }
