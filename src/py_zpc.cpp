@@ -18,7 +18,7 @@ public:
     PyReader(){
         fd=shm_open(SHM_NAME,O_RDWR,0666);
         if(fd==-1) throw std::runtime_error("Writer not running");
-        layout=static_cast<SharedMemoryLayout*>(mmap(0,sizeof(SharedMemoryLayout),PROT_READ,MAP_SHARED,fd,0));
+        layout=static_cast<SharedMemoryLayout*>(mmap(0,sizeof(SharedMemoryLayout),PROT_READ|PROT_WRITE,MAP_SHARED,fd,0));
         if(layout==MAP_FAILED){
             close(fd);
             throw std::runtime_error("mmap failed");
@@ -40,6 +40,13 @@ public:
     uint64_t get_head_pos(){
         return layout->control.head.load(std::memory_order_relaxed);
     }
+    uint64_t get_tail_pos() {
+    return layout->control.tail.load(std::memory_order_relaxed);
+    }
+
+    void update_tail(uint64_t new_tail) {
+        layout->control.tail.store(new_tail, std::memory_order_release);
+    }
 };
 
 PYBIND11_MODULE(zpc,m){
@@ -47,5 +54,7 @@ PYBIND11_MODULE(zpc,m){
     py::class_<PyReader>(m,"Reader")
         .def(py::init<>())
         .def("get_head_pos",&PyReader::get_head_pos)
+        .def("get_tail_pos",&PyReader::get_tail_pos)
+        .def("update_tail",&PyReader::update_tail)
         .def("get_buffer",&PyReader::get_buffer);
 }
