@@ -11,3 +11,10 @@ target_link_libraries(writer rt pthread)
 
 add_executable(reader src/reader.cpp)
 target_link_libraries(reader rt pthread)
+
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(pybind11 REQUIRED)
+
+pybind11_add_module(zpc src/py_zpc.cpp)
+
+target_link_libraries(zpc PRIVATE pthread rt)
