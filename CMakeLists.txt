@@ -16,5 +16,7 @@ find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 REQUIRED)
 
 pybind11_add_module(zpc src/py_zpc.cpp)
-
 target_link_libraries(zpc PRIVATE pthread rt)
+
+add_executable(xdp_writer src/xdp_writer.cpp)
+target_link_libraries(xdp_writer rt pthread bpf)
